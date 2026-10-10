@@ -6,10 +6,10 @@ const serverDir = path.join(rootDir, 'server');
 const clientDir = path.join(rootDir, 'client');
 
 console.log('==> [Render/Build Hook] Installing server dependencies...');
-execSync('npm install', { cwd: serverDir, stdio: 'inherit' });
+execSync('npm install --include=dev', { cwd: serverDir, stdio: 'inherit' });
 
-console.log('==> [Render/Build Hook] Installing client dependencies...');
-execSync('npm install', { cwd: clientDir, stdio: 'inherit' });
+console.log('==> [Render/Build Hook] Installing client dependencies (including Vite)...');
+execSync('npm install --include=dev', { cwd: clientDir, stdio: 'inherit' });
 
 console.log('==> [Render/Build Hook] Building React production frontend...');
 execSync('npm run build', { cwd: clientDir, stdio: 'inherit' });
