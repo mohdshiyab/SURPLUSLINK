@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const SimulationClock = require('../models/SimulationClock');
