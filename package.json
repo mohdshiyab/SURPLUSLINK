@@ -1,0 +1,24 @@
+{
+  "name": "surpluslink",
+  "version": "1.0.0",
+  "description": "SurplusLink - MERN Food Rescue Web Application with Rule Engine and Invariant Verification",
+  "scripts": {
+    "start": "node server/src/index.js",
+    "server": "npm --prefix server start",
+    "client": "npm --prefix client dev",
+    "build": "npm --prefix client run build",
+    "test": "npm --prefix server test",
+    "seed:reset": "npm --prefix server run seed:reset"
+  },
+  "keywords": [
+    "mern",
+    "food-rescue",
+    "hackathon",
+    "mongodb",
+    "express",
+    "react",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT"
+}
