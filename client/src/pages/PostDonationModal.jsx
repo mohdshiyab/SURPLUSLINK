@@ -68,13 +68,25 @@ export default function PostDonationModal({ isOpen, onClose, onDonationCreated, 
               <div
                 style={{
                   background: 'var(--bg-subtle)',
-                  padding: '10px 14px',
+                  padding: '12px 14px',
                   borderRadius: 'var(--radius-sm)',
                   fontSize: '0.85rem',
-                  marginBottom: 16
+                  marginBottom: 16,
+                  border: '1px solid var(--border)'
                 }}
               >
-                Posting as: <strong>{donor.restaurantName || donor.name}</strong> (Zone: <strong>{donor.zone}</strong>)
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span>Posting as: <strong>{donor.restaurantName || donor.name}</strong></span>
+                  <span style={{ color: 'var(--primary-dark)', fontWeight: 600 }}>Zone: {donor.zone}</span>
+                </div>
+                {donor.address && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: 4 }}>
+                    <span>📍 Pickup Address: <strong>{donor.address}</strong></span>
+                  </div>
+                )}
+                <div style={{ fontSize: '0.75rem', color: '#059669', marginTop: 4, fontWeight: 500 }}>
+                  ✓ Verified location pinned for volunteer GPS navigation
+                </div>
               </div>
             )}
 

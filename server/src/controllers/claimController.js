@@ -95,7 +95,9 @@ async function getMyClaims(req, res) {
               pickup_until: donation.pickup_until,
               zone: donation.zone,
               restaurantName: donor ? donor.restaurantName : donation.donor_id,
-              address: donor ? donor.address : ''
+              address: donor ? donor.address : '',
+              location: donor ? donor.location : null,
+              coordinates: donor?.location?.coordinates ? [donor.location.coordinates[1], donor.location.coordinates[0]] : null // [lat, lon]
             }
           : null,
         canCollect,

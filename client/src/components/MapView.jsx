@@ -37,7 +37,32 @@ export default function MapView({ locations = [], center = [12.9716, 77.5946], z
                       Zone: <strong>{loc.zone}</strong>
                     </div>
                   )}
-                  {loc.desc && <p style={{ fontSize: '0.75rem', marginTop: 4 }}>{loc.desc}</p>}
+                  {loc.address && (
+                    <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: 4 }}>
+                      📍 {loc.address}
+                    </div>
+                  )}
+                  {loc.desc && <p style={{ fontSize: '0.75rem', marginTop: 4, marginBottom: 6 }}>{loc.desc}</p>}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      background: '#059669',
+                      color: '#ffffff',
+                      fontSize: '0.75rem',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      textDecoration: 'none',
+                      fontWeight: 600,
+                      marginTop: 4
+                    }}
+                  >
+                    🧭 Open Navigation
+                  </a>
                 </div>
               </Popup>
             </Marker>

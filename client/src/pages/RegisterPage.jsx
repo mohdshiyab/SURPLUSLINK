@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { UserPlus, AlertCircle, Store, Bike, MapPin } from 'lucide-react';
+import LocationPicker from '../components/LocationPicker';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -171,61 +172,72 @@ export default function RegisterPage() {
           </div>
 
           {form.role === 'VOLUNTEER' ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div className="form-group">
-                <label className="form-label">Vehicle Capacity (Whole kg) *</label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  className="form-input"
-                  required
-                  value={form.capacity_kg}
-                  onChange={(e) => setForm({ ...form, capacity_kg: e.target.value })}
-                />
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label className="form-label">Vehicle Capacity (Whole kg) *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className="form-input"
+                    required
+                    value={form.capacity_kg}
+                    onChange={(e) => setForm({ ...form, capacity_kg: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Vehicle Type</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Hatchback, Cargo Van"
+                    value={form.vehicleType}
+                    onChange={(e) => setForm({ ...form, vehicleType: e.target.value })}
+                  />
+                </div>
               </div>
+
+              {/* Volunteer location permission capture */}
+              <div className="form-group" style={{ background: 'var(--bg-subtle)', padding: 12, borderRadius: 'var(--radius-md)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Home / Base Coordinates</span>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={handleGetLocation}
+                  >
+                    <MapPin size={12} /> Auto-Detect via GPS
+                  </button>
+                </div>
+                {geoStatus && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                    {geoStatus}
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
               <div className="form-group">
-                <label className="form-label">Vehicle Type</label>
+                <label className="form-label">Restaurant Pickup Address & Landmark *</label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="e.g. Hatchback, Cargo Van"
-                  value={form.vehicleType}
-                  onChange={(e) => setForm({ ...form, vehicleType: e.target.value })}
+                  required
+                  placeholder="e.g. 14 Market Street, Near Metro Station, Indiranagar"
+                  value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })}
                 />
               </div>
-            </div>
-          ) : (
-            <div className="form-group">
-              <label className="form-label">Restaurant Address</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g. 14 Market Street, North Food Plaza"
-                value={form.address}
-                onChange={(e) => setForm({ ...form, address: e.target.value })}
-              />
-            </div>
-          )}
 
-          {/* Location permission capture with manual fallback */}
-          <div className="form-group" style={{ background: 'var(--bg-subtle)', padding: 12, borderRadius: 'var(--radius-md)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Location Coordinates</span>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={handleGetLocation}
-              >
-                <MapPin size={12} /> Auto-Detect via GPS
-              </button>
-            </div>
-            {geoStatus && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                {geoStatus}
-              </div>
-            )}
-          </div>
+              <LocationPicker
+                value={form.coordinates}
+                zone={form.zone}
+                onChange={(coords) => setForm((prev) => ({ ...prev, coordinates: coords }))}
+              />
+            </>
+          )}
 
           <button
             type="submit"

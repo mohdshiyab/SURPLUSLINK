@@ -19,7 +19,9 @@ async function authenticate(req, res, next) {
           role: 'RESTAURANT',
           donorId: demoId,
           name: restaurant ? restaurant.restaurantName : demoId,
-          zone: restaurant ? restaurant.zone : ''
+          zone: restaurant ? restaurant.zone : '',
+          address: restaurant ? restaurant.address : '',
+          location: restaurant ? restaurant.location : null
         };
         return next();
       } else if (demoId.startsWith('V')) {
@@ -66,7 +68,9 @@ async function authenticate(req, res, next) {
           volunteerId: profile ? profile.volunteerId : user.demoId,
           zone: profile ? profile.zone : undefined,
           zones: profile ? profile.zones : undefined,
-          capacity_kg: profile ? profile.capacity_kg : undefined
+          capacity_kg: profile ? profile.capacity_kg : undefined,
+          address: profile ? profile.address : undefined,
+          location: profile ? profile.location : undefined
         };
         return next();
       }

@@ -4,6 +4,7 @@ import { useClock } from '../context/ClockContext';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
 import MapView from '../components/MapView';
+import RestaurantLocationModal from '../components/RestaurantLocationModal';
 import {
   MapPin,
   Clock,
@@ -28,6 +29,7 @@ export default function VolunteerDashboard() {
   const [zoneFilter, setZoneFilter] = useState('ALL');
   const [sortOption, setSortOption] = useState('urgency');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+  const [selectedLocationDonation, setSelectedLocationDonation] = useState(null);
 
   // Claim Modal state
   const [claimDonation, setClaimDonation] = useState(null);
@@ -110,6 +112,7 @@ export default function VolunteerDashboard() {
       coordinates: d.donorLocation.coordinates,
       title: `${d.restaurantName} - ${d.remaining_kg}kg ${d.description}`,
       zone: d.zone,
+      address: d.address,
       desc: `Pickup: ${d.pickup_from.slice(11)} to ${d.pickup_until.slice(11)}`
     }));
 
@@ -242,7 +245,7 @@ export default function VolunteerDashboard() {
 
             return (
               <div key={d.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                   <div>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 800 }}>{d.description}</h3>
                     <div style={{ fontSize: '0.85rem', color: 'var(--primary-dark)', fontWeight: 600 }}>
@@ -250,6 +253,13 @@ export default function VolunteerDashboard() {
                     </div>
                   </div>
                   <StatusBadge status={d.status} />
+                </div>
+
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+                  <MapPin size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {d.address || `${d.restaurantName}, Zone ${d.zone}`}
+                  </span>
                 </div>
 
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
@@ -346,6 +356,15 @@ export default function VolunteerDashboard() {
 
                 <button
                   type="button"
+                  className="btn btn-secondary btn-sm"
+                  style={{ width: '100%', marginBottom: 8, fontSize: '0.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                  onClick={() => setSelectedLocationDonation(d)}
+                >
+                  <MapPin size={14} color="var(--primary)" /> View Restaurant on Map
+                </button>
+
+                <button
+                  type="button"
                   className="btn btn-primary"
                   style={{ width: '100%', marginTop: 'auto' }}
                   disabled={!canClaim}
@@ -396,6 +415,22 @@ export default function VolunteerDashboard() {
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 8 }}>
                     Pickup window: <strong>{claimDonation.pickup_from}</strong> to <strong>{claimDonation.pickup_until}</strong>
                   </div>
+                  {claimDonation.address && (
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text)', marginTop: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', padding: '6px 10px', borderRadius: '4px', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <MapPin size={13} color="var(--primary)" />
+                        <span>Pickup: <strong>{claimDonation.address}</strong></span>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '0.72rem', padding: '2px 8px' }}
+                        onClick={() => setSelectedLocationDonation(claimDonation)}
+                      >
+                        📍 Map
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {claimErrors.length > 0 && (
@@ -456,6 +491,23 @@ export default function VolunteerDashboard() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Restaurant Location & Directions Modal */}
+      {selectedLocationDonation && (
+        <RestaurantLocationModal
+          isOpen={!!selectedLocationDonation}
+          onClose={() => setSelectedLocationDonation(null)}
+          restaurantName={selectedLocationDonation.restaurantName}
+          address={selectedLocationDonation.address}
+          zone={selectedLocationDonation.zone}
+          coordinates={selectedLocationDonation.coordinates || selectedLocationDonation.donorLocation?.coordinates}
+          foodDescription={selectedLocationDonation.description}
+          pickupWindow={{
+            from: selectedLocationDonation.pickup_from ? selectedLocationDonation.pickup_from.slice(11) : '',
+            until: selectedLocationDonation.pickup_until ? selectedLocationDonation.pickup_until.slice(11) : ''
+          }}
+        />
       )}
     </div>
   );

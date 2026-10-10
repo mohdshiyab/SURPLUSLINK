@@ -58,6 +58,8 @@ async function listDonations(req, res) {
         id: d.id,
         donor_id: d.donor_id,
         restaurantName: donor ? donor.restaurantName : d.donor_id,
+        address: donor ? donor.address : '',
+        coordinates: donor?.location?.coordinates ? [donor.location.coordinates[1], donor.location.coordinates[0]] : null,
         description: d.description,
         quantity_kg: d.quantity_kg,
         remaining_kg: remaining,

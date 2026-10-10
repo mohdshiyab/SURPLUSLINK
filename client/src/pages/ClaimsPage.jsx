@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useClock } from '../context/ClockContext';
 import { api } from '../api/client';
 import StatusBadge from '../components/StatusBadge';
+import RestaurantLocationModal from '../components/RestaurantLocationModal';
 import {
   PackageCheck,
   Clock,
@@ -11,7 +12,9 @@ import {
   XCircle,
   HeartHandshake,
   RefreshCw,
-  Share2
+  Share2,
+  MapPin,
+  Navigation
 } from 'lucide-react';
 
 export default function ClaimsPage() {
@@ -22,6 +25,7 @@ export default function ClaimsPage() {
   const [loading, setLoading] = useState(true);
   const [actionMsg, setActionMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [selectedClaimLocation, setSelectedClaimLocation] = useState(null);
 
   // Distribution Modal state
   const [distributeClaim, setDistributeClaim] = useState(null);
@@ -179,7 +183,7 @@ export default function ClaimsPage() {
                 <tr>
                   <th>Claim ID</th>
                   <th>Food Description</th>
-                  <th>Restaurant & Zone</th>
+                  <th>Restaurant & Pickup Location</th>
                   <th>Quantity</th>
                   <th>Planned Pickup T</th>
                   <th>Status</th>
@@ -201,10 +205,24 @@ export default function ClaimsPage() {
                         <strong>{d?.description || c.donation_id}</strong>
                       </td>
                       <td>
-                        <div>{d?.restaurantName || 'Restaurant'}</div>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          Zone: {d?.zone}
-                        </span>
+                        <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>{d?.restaurantName || 'Restaurant'}</div>
+                        {d?.address && (
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <MapPin size={12} color="var(--primary)" style={{ flexShrink: 0 }} />
+                            <span>{d.address}</span>
+                          </div>
+                        )}
+                        <div style={{ fontSize: '0.75rem', color: 'var(--primary-dark)', marginTop: 2 }}>
+                          Zone: <strong>{d?.zone}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          style={{ fontSize: '0.73rem', padding: '2px 8px', marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                          onClick={() => setSelectedClaimLocation(c)}
+                        >
+                          <Navigation size={12} color="var(--primary)" /> View Map
+                        </button>
                       </td>
                       <td>
                         <strong style={{ fontSize: '1rem', color: 'var(--primary-dark)' }}>
@@ -232,6 +250,15 @@ export default function ClaimsPage() {
                             <div style={{ marginTop: 2 }}>
                               Cancel Rule: Only strictly before {c.plannedPickupTime.slice(11)}
                             </div>
+                            {!c.canCollect ? (
+                              <div style={{ color: '#d97706', fontWeight: 600, marginTop: 4, fontSize: '0.73rem' }}>
+                                ⏳ Opens at {d?.pickup_from?.slice(11)} (Clock is {simulatedNow.slice(11)})
+                              </div>
+                            ) : (
+                              <div style={{ color: '#059669', fontWeight: 600, marginTop: 4, fontSize: '0.73rem' }}>
+                                ✓ Window open! Ready for pickup.
+                              </div>
+                            )}
                           </>
                         )}
                         {c.status === 'COLLECTED' && (
@@ -253,12 +280,19 @@ export default function ClaimsPage() {
                           {c.status === 'ACTIVE' && (
                             <>
                               <button
+                                className="btn btn-sm btn-secondary"
+                                title="Open restaurant location map and turn-by-turn navigation"
+                                onClick={() => setSelectedClaimLocation(c)}
+                              >
+                                <Navigation size={13} color="var(--primary)" /> Route Map
+                              </button>
+                              <button
                                 className="btn btn-sm btn-primary"
                                 disabled={!c.canCollect}
                                 title={
                                   c.canCollect
                                     ? 'Collect now'
-                                    : 'Only permitted inside pickup window [pickup_from, pickup_until]'
+                                    : `Pickup locked: Clock is ${simulatedNow.slice(11)}. Window starts at ${d?.pickup_from?.slice(11)}. Advance time to ${d?.pickup_from?.slice(11)} to collect.`
                                 }
                                 onClick={() => handleCollect(c.claim_id)}
                               >
@@ -383,6 +417,24 @@ export default function ClaimsPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Restaurant Location & Directions Modal */}
+      {selectedClaimLocation && (
+        <RestaurantLocationModal
+          isOpen={!!selectedClaimLocation}
+          onClose={() => setSelectedClaimLocation(null)}
+          restaurantName={selectedClaimLocation.donation?.restaurantName}
+          address={selectedClaimLocation.donation?.address}
+          zone={selectedClaimLocation.donation?.zone}
+          coordinates={selectedClaimLocation.donation?.coordinates || selectedClaimLocation.donation?.location?.coordinates}
+          foodDescription={selectedClaimLocation.donation?.description}
+          claimKg={selectedClaimLocation.kg}
+          pickupWindow={{
+            from: selectedClaimLocation.donation?.pickup_from ? selectedClaimLocation.donation.pickup_from.slice(11) : '',
+            until: selectedClaimLocation.donation?.pickup_until ? selectedClaimLocation.donation.pickup_until.slice(11) : ''
+          }}
+        />
       )}
     </div>
   );
