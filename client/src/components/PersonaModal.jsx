@@ -1,15 +1,29 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { UserCheck, Store, Bike, ShieldCheck } from 'lucide-react';
+import { UserCheck, Store, Bike, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function PersonaModal({ isOpen, onClose }) {
   const { actor, demoPeople, actAs } = useAuth();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
   const handleSelect = async (personId) => {
-    await actAs(personId);
-    onClose();
+    try {
+      await actAs(personId);
+      onClose();
+
+      if (personId.startsWith('D')) {
+        navigate('/restaurant');
+      } else if (personId.startsWith('V')) {
+        navigate('/volunteer');
+      } else if (personId === 'COORD1') {
+        navigate('/coordinator');
+      }
+    } catch (err) {
+      console.error('[Select Persona Error]', err);
+    }
   };
 
   return (
@@ -28,7 +42,7 @@ export default function PersonaModal({ isOpen, onClose }) {
         <div className="modal-body">
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 16 }}>
             Official Hackathon Requirement: Evaluators can test full donor and volunteer workflows without registration.
-            Select any persona below to switch identities instantly.
+            Select any persona below to switch identities and open their dashboard immediately.
           </p>
 
           <h4
@@ -42,7 +56,7 @@ export default function PersonaModal({ isOpen, onClose }) {
               gap: 6
             }}
           >
-            <Store size={16} /> Restaurant Donors (D1–D5)
+            <Store size={16} /> Restaurant Donors (D1–D5) — Click to open Restaurant Dashboard
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10, marginBottom: 20 }}>
             {demoPeople.donors.map((d) => {
@@ -77,11 +91,19 @@ export default function PersonaModal({ isOpen, onClose }) {
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
                     Zone: <strong>{d.zone}</strong>
                   </div>
-                  {isCurrent && (
-                    <div style={{ fontSize: '0.7rem', color: 'var(--primary-dark)', fontWeight: 700, marginTop: 4 }}>
-                      ✓ Active Persona
-                    </div>
-                  )}
+                  <div
+                    style={{
+                      fontSize: '0.75rem',
+                      color: isCurrent ? 'var(--primary-dark)' : 'var(--primary)',
+                      fontWeight: 700,
+                      marginTop: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    {isCurrent ? '✓ Active (Open Dashboard)' : 'Select Persona'} <ArrowRight size={12} />
+                  </div>
                 </div>
               );
             })}
@@ -98,7 +120,7 @@ export default function PersonaModal({ isOpen, onClose }) {
               gap: 6
             }}
           >
-            <Bike size={16} /> Volunteers (V1–V6)
+            <Bike size={16} /> Volunteers (V1–V6) — Click to open Volunteer Feed
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 10, marginBottom: 20 }}>
             {demoPeople.volunteers.map((v) => {
@@ -136,11 +158,19 @@ export default function PersonaModal({ isOpen, onClose }) {
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     Zones: <strong>{v.zones.join(', ')}</strong>
                   </div>
-                  {isCurrent && (
-                    <div style={{ fontSize: '0.7rem', color: 'var(--primary-dark)', fontWeight: 700, marginTop: 4 }}>
-                      ✓ Active Persona
-                    </div>
-                  )}
+                  <div
+                    style={{
+                      fontSize: '0.75rem',
+                      color: isCurrent ? 'var(--primary-dark)' : 'var(--primary)',
+                      fontWeight: 700,
+                      marginTop: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4
+                    }}
+                  >
+                    {isCurrent ? '✓ Active (Open Feed)' : 'Select Persona'} <ArrowRight size={12} />
+                  </div>
                 </div>
               );
             })}
@@ -169,8 +199,13 @@ export default function PersonaModal({ isOpen, onClose }) {
               cursor: 'pointer'
             }}
           >
-            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>City NGO Coordinator</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>City NGO Coordinator</div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Open Overview <ArrowRight size={12} />
+              </span>
+            </div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
               Aggregate platform oversight, system health, and donation telemetry.
             </div>
           </div>

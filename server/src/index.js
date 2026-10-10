@@ -31,6 +31,8 @@ app.use(authenticate);
 
 // API Routes
 app.use('/api/auth', authRoutes);
+const { getMe } = require('./controllers/authController');
+app.get('/api/session/me', getMe);
 app.use('/api/session', authRoutes);
 app.use('/api/demo', demoRoutes);
 app.use('/api/donations', donationRoutes);

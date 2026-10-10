@@ -98,6 +98,35 @@ export default function LandingPage() {
               <Bike size={18} /> Act as Volunteer (V1)
             </button>
           </div>
+
+          {actor && (
+            <div
+              style={{
+                marginTop: 20,
+                padding: '10px 16px',
+                borderRadius: 'var(--radius-md)',
+                background: 'rgba(255, 255, 255, 0.2)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 12
+              }}
+            >
+              <span style={{ fontSize: '0.85rem' }}>
+                Currently active: <strong>{actor.name}</strong> ({actor.donorId || actor.volunteerId || actor.role})
+              </span>
+              <button
+                className="btn btn-sm"
+                style={{ background: '#ffffff', color: 'var(--primary-dark)', fontWeight: 700 }}
+                onClick={() => {
+                  if (actor.role === 'RESTAURANT') navigate('/restaurant');
+                  else if (actor.role === 'VOLUNTEER') navigate('/volunteer');
+                  else navigate('/coordinator');
+                }}
+              >
+                Go to Dashboard →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

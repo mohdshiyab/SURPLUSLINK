@@ -4,6 +4,7 @@ const { register, login, getMe } = require('../controllers/authController');
 
 router.post('/register', register);
 router.post('/login', login);
+router.get('/me', getMe);
 router.get('/session/me', getMe);
 
 module.exports = router;
